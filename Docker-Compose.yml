@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: "${}_mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123Password
+      MYSQL_DATABASE: Example_db
+      MYSQL_USER: Wordpress
+      MYSQL_PASSWORD: 23password
+    volumes:
+      - Example_mysql_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:latest
+    container_name: Example_wordpress"
+    ports:
+      - "80:80"
+    depends_on:
+      - mysql
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: Example_user
+      WORDPRESS_DB_PASSWORD: Example_password
+      WORDPRESS_DB_NAME: Example_db
+    volumes:
+      - Example_wp_data:/var/www/html
+    restart: always
+
+volumes:
+  Example_mysql_data:
+  Example_wp_data:
+EOF
