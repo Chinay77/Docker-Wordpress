@@ -11,6 +11,7 @@ Check if docker and docker-compose is installed on the system. If not present, i
 Update the apt package index and install packages to allow apt to use a repository over HTTPS:
 
  sudo apt-get update
+ 
  sudo apt-get install ca-certificates curl gnupg
  
 * Add Docker’s official GPG key:
@@ -58,7 +59,9 @@ docker-compose up -d
 
 Then use this commands to make a new directory-
 mkdir dc
+
 cd dc
+
 sudo nano docker-compose.yml
 
 # STEP 5: Paste the yml file and press ctrl+x - y - Enter.
@@ -66,6 +69,7 @@ sudo nano docker-compose.yml
 # STEP 6: Created Bash Script and added to dc dir
 
 Touch manage_wordpress.sh
+
 sudo nano manage_wordpress.sh
 
 # STEP 7: Paste the script and press ctrl+x - y - Enter.
