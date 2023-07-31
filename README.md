@@ -1,103 +1,129 @@
-# Docker-Wordpress
-AWS EC2 INSTANCE 
+# Docker-Wordpress on AWS EC2 Instance
 
-# STEP 1:
-Check if docker and docker-compose is installed on the system. If not present, install the missing packages.
-![image](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/fbf75d79-4870-4d29-b693-0bfa3bee7357)
+![Docker-Wordpress](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/fbf75d79-4870-4d29-b693-0bfa3bee7357)
 
-# STEP 2: Installed Docker from https://docs.docker.com/engine/install/ubuntu/
+This repository contains instructions to set up WordPress on an AWS EC2 instance using Docker.
 
-* Set up the repository
-Update the apt package index and install packages to allow apt to use a repository over HTTPS:
+## Prerequisites
+- Ensure that Docker and Docker Compose are installed on the system. If not present, install the missing packages.
 
- sudo apt-get update
- 
- sudo apt-get install ca-certificates curl gnupg
- 
-* Add Docker’s official GPG key:
+## Step 1: Install Docker
+Install Docker on the AWS EC2 instance by following the steps below:
 
- sudo install -m 0755 -d /etc/apt/keyrings
- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
- sudo chmod a+r /etc/apt/keyrings/docker.gpg
- 
-* Use the following command to set up the repository:
+![Install Docker](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/574a2df7-1f70-4d11-986c-f16c71515e47)
 
- echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+1. Set up the repository:
+```bash
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-*  Install Docker Engine
-  
-sudo apt-get update 
+echo "deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+2. Install Docker Engine:
+```bash
+sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo docker run hello-world
+```
 
-![image](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/574a2df7-1f70-4d11-986c-f16c71515e47)
+## Step 3: Install Docker Compose
+Install Docker Compose on the AWS EC2 instance with the following commands:
 
-# STEP 3: install Docker Compose on your AWS EC2 instance
+![Install Docker Compose](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/3d6e802f-73a0-4f8d-be8f-7160b6b5a48e)
 
-* Download the Docker Compose binary
+```bash
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-* Apply executable permissions to the binary
 sudo chmod +x /usr/local/bin/docker-compose
-
-* Create a symbolic link to make it accessible in the system path
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
 
-![image](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/3d6e802f-73a0-4f8d-be8f-7160b6b5a48e)
+## Step 4: Clone the repository and setup WordPress
+1. Clone this repository and navigate to the downloaded directory:
 
+```bash
+git clone https://github.com/Chinay77/Docker-Wordpress.git
+cd Docker-Wordpress
+```
 
-sudo docker-compose up -d
-sudo systemctl start docker
-sudo usermod -aG docker $USER
-newgrp docker
-docker-compose up -d
+2. Create a new directory and open the docker-compose.yml file for editing:
 
-# STEP 4: Copy yml file from https://hub.docker.com/_/wordpress or download from my repo 
-
-Then use this commands to make a new directory-
+```bash
 mkdir dc
-
 cd dc
-
 sudo nano docker-compose.yml
+```
 
-# STEP 5: Paste the yml file and press ctrl+x - y - Enter.
+3. Paste the contents of the docker-compose.yml file into the editor, then press `Ctrl+X`, `Y`, and `Enter` to save and exit.
 
-# STEP 6: Created Bash Script and added to dc dir
+## Step 5: Manage WordPress with Bash Script
+1. Create and edit a bash script for managing WordPress:
 
-Touch manage_wordpress.sh
-
+```bash
+touch manage_wordpress.sh
 sudo nano manage_wordpress.sh
+```
 
-# STEP 7: Paste the script and press ctrl+x - y - Enter.
+2. Paste the following script into the editor, then press `Ctrl+X`, `Y`, and `Enter` to save and exit.
 
-# STEP 8: Use the following Commands-
+```bash
+#!/bin/bash
 
+case "$1" in
+  "enable")
+    docker-compose up -d
+    sudo systemctl start docker
+    sudo usermod -aG docker $USER
+    newgrp docker
+    docker-compose up -d
+    ;;
+  "disable")
+    docker-compose down
+    ;;
+  "delete")
+    docker-compose down --volumes
+    ;;
+  *)
+    echo "Usage: $0 {enable|disable|delete}"
+    exit 1
+esac
+```
+
+3. Make the script executable:
+
+```bash
+chmod +x manage_wordpress.sh
+```
+
+## Step 6: Enable WordPress and Access Site
+1. Add an entry to the `/etc/hosts` file to map your site name:
+
+```bash
 sudo bash -c 'echo "127.0.0.1 Site_name.com" >> /etc/hosts'
+```
+
+2. Enable WordPress using the bash script:
+
+```bash
 ./manage_wordpress.sh enable
+```
 
-![image](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/5e4092b8-c853-4d36-b4a5-5683a3f34989)
+3. Open a web browser and enter the URL to access your WordPress site.
 
-# STEP 9: Paste the url in the web Browser 
+## Step 7: Disable and Delete WordPress
+To disable the WordPress site and stop the containers:
 
-![image](https://github.com/Chinay77/Docker-Wordpress/assets/105514247/22d79536-a34d-4611-96de-22d425069dd4)
-
-Wordpress on AWS using Docker is Running.
-
-# STEP 10: To disable the WordPress site (stop the containers):
-
+```bash
 ./manage_wordpress.sh disable
+```
 
-To delete the WordPress site (stop and remove containers, as well as local volumes):
+To delete the WordPress site, stopping and removing containers as well as local volumes:
 
+```bash
 ./manage_wordpress.sh delete
+```
 
-
-THANK YOU (:
-
-
-
-
+Thank you for using Docker-Wordpress on AWS!
